@@ -14,8 +14,9 @@ MonoBehaviour:
   id: idExchange
   title: ID Exchange
   author: TasThing
-  description: "Let\u2019s clap for them then. \u201CWow, what an amazing person.\u201D\n\nModule
-    idea by Grunkle Squeaky, implementation by TasThing."
-  version: 1.0
+  description: "Let\u2019s clap for them then. \u201CWow, what an amazing person.\u201D\r\n\r\nModule
+    idea by Grunkle Squeaky, implementation by TasThing.\r\n\r\n[url=https://ktane.timwi.de/HTML/ID%20Exchange.html]Manual
+    HTML[/url]\r\n[url=https://ktane.timwi.de/PDF/ID%20Exchange.pdf]Manual PDF[/url]"
+  version: 1.0.1
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 7b1cf57b2ec37b046ba41399e31e00af, type: 3}

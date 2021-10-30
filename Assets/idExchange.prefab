@@ -4459,14 +4459,14 @@ MonoBehaviour:
   portraitTextures:
   - {fileID: 2800000, guid: db0eabab82490cc4d93ee7f77bd3e60e, type: 3}
   - {fileID: 2800000, guid: 4b85252f8a1f160449d4fb0c94e10f88, type: 3}
-  - {fileID: 2800000, guid: 7e21388c835dd9e48aec749a4db5cfb7, type: 3}
+  - {fileID: 2800000, guid: 2f29832c2b7543848915cd784b22f187, type: 3}
   - {fileID: 2800000, guid: 8fc0c7235d9ae5447b32e30257c6274a, type: 3}
   - {fileID: 2800000, guid: 10f31c52ba28b3145aee64904a4436e7, type: 3}
   - {fileID: 2800000, guid: 0ecc9594344ea604e901077c1737c442, type: 3}
   - {fileID: 2800000, guid: 26e694afd5d563748897136dcd6ce022, type: 3}
   - {fileID: 2800000, guid: 36e1c0dd7211d1942ac462c59608c3e8, type: 3}
   - {fileID: 2800000, guid: 30813ebe4a5f84f4fa6c6b59a7a92153, type: 3}
-  - {fileID: 2800000, guid: 2f29832c2b7543848915cd784b22f187, type: 3}
+  - {fileID: 2800000, guid: 7e21388c835dd9e48aec749a4db5cfb7, type: 3}
   - {fileID: 2800000, guid: 2c4824400fd0e294c9f45a3b187fe3e0, type: 3}
   - {fileID: 2800000, guid: 7ed73b275385cf04684c9b75076f37ae, type: 3}
   - {fileID: 2800000, guid: c57cab92523e0e44a90eb9d5d57dc6a9, type: 3}
