@@ -397,4 +397,107 @@ public partial class idExchange : MonoBehaviour
         if (!moduleSolved)
             garnet.SetActive(false);
     }
+
+    // Twitch Plays
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = "!{0} Jungmoon [Press Jungmoon's portrait, any name on the module can be used] | !{0} display [Press the stage counter] | !{0} crosshair [Press the crosshair] | !{0} <left/right> [Press that blank card] | !{0} stage <xx> [During stage recovery, press the blank cards until stage xx is displayed]";
+#pragma warning restore 414
+
+    private IEnumerator ProcessTwitchCommand(string input)
+    {
+        input = input.Trim().ToLowerInvariant();
+        var validStageNumbers = Enumerable.Range(1, stageCount).Select(x => x.ToString()).ToArray();
+        if (input == "display")
+        {
+            yield return null;
+            displayButton.OnInteract();
+        }
+        else if (input == "crosshair")
+        {
+            if (!crosshair.gameObject.activeSelf)
+            {
+                yield return "sendtochaterror You can't do that yet.";
+                yield break;
+            }
+            yield return null;
+            crosshair.OnInteract();
+        }
+        else if (input == "left")
+        {
+            yield return null;
+            cards[0].OnInteract();
+        }
+        else if (input == "right")
+        {
+            yield return null;
+            cards[1].OnInteract();
+        }
+        else if (playerNames.Select(x => x.ToLowerInvariant()).Contains(input))
+        {
+            if (!solvable)
+            {
+                yield return "sendtochaterror You can't do that yet.";
+                yield break;
+            }
+            yield return null;
+            var lowercaseNames = playerNames.Select(x => x.ToLowerInvariant()).ToArray();
+            portraitButtons[Array.IndexOf(lowercaseNames, input)].OnInteract();
+        }
+        else if (input.StartsWith("stage "))
+        {
+            if (!validStageNumbers.Contains(input.Substring(6)))
+            {
+                yield return "sendtochaterror Not a valid stage number.";
+                yield break;
+            }
+            var number = int.Parse(input.Substring(6));
+            if (recoveryDisplay > number)
+            {
+                while (recoveryDisplay != number)
+                {
+                    yield return new WaitForSeconds(.1f);
+                    cards[0].OnInteract();
+                }
+            }
+            else if (recoveryDisplay < number)
+            {
+                while (recoveryDisplay != number)
+                {
+                    yield return new WaitForSeconds(.1f);
+                    cards[1].OnInteract();
+                }
+            }
+            else
+            {
+                yield return "sendtochaterror That stage is already displayed, stoopid.";
+                yield break;
+            }
+        }
+        else
+            yield break;
+    }
+
+    private IEnumerator TwitchHandleForcedSolve()
+    {
+        while (!solvable)
+        {
+            yield return null;
+            yield return true;
+        }
+        if (!crosshair.gameObject.activeSelf)
+            goto submitConvict;
+        for (int i = 0; i < 13; i++)
+        {
+            if (selectedTokens[i] != tokens[i])
+            {
+                yield return new WaitForSeconds(.1f);
+                portraitButtons[i].OnInteract();
+            }
+        }
+        yield return new WaitForSeconds(.1f);
+        crosshair.OnInteract();
+    submitConvict:
+        yield return new WaitForSeconds(.1f);
+        portraitButtons[Array.IndexOf(playerRoles, role.convict)].OnInteract();
+    }
 }
