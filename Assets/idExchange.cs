@@ -37,7 +37,6 @@ public partial class idExchange : MonoBehaviour
     private bool solvable;
     private int stageCount;
     private int currentlySolved;
-    private List<string> solveList = new List<string>();
     private string[] ignoreList;
 
     private static readonly string[] letterRows = new string[13] { "AZ", "BY", "CX", "DW", "EV", "FU", "GT", "HS", "IR", "JQ", "KP", "LO", "MN" };
@@ -353,14 +352,12 @@ public partial class idExchange : MonoBehaviour
     {
         if (solvable || moduleSolved)
             return;
-        var mostRecent = GetLatestSolve(bomb.GetSolvedModuleNames(), solveList);
-        solveList.Add(mostRecent);
-        Debug.Log("New solve: " + mostRecent);
-        if (currentlySolved != solveList.Count() && !ignoreList.Contains(mostRecent))
+        var prevAmountSolved = currentlySolved;
+        currentlySolved = bomb.GetSolvedModuleNames().Where(x => !ignoreList.Contains(x)).Count();
+        if (currentlySolved != prevAmountSolved)
         {
-            currentlySolved++;
             stage++;
-            if (currentlySolved == stageCount)
+            if (stage == stageCount)
                 ReadyToSolve();
             else
                 GenerateStage();
