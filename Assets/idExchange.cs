@@ -38,6 +38,8 @@ public partial class idExchange : MonoBehaviour
     private int stageCount;
     private int currentlySolved;
     private string[] ignoreList;
+    private bool readyToAdvance = true;
+    private const float waitTime = 5f; // change this as you wish
 
     private static readonly string[] letterRows = new string[13] { "AZ", "BY", "CX", "DW", "EV", "FU", "GT", "HS", "IR", "JQ", "KP", "LO", "MN" };
     private static readonly string[] playerNames = new string[13] { "Jungmoon", "Yeonseung", "Jinho", "Dongmin", "Kyunghoon", "Kyungran", "Yoohyun", "Junseok", "Sangmin", "Yohwan", "Yoonsun", "Hyunmin", "Junghyun" };
@@ -157,6 +159,8 @@ public partial class idExchange : MonoBehaviour
 
     private void GenerateStage()
     {
+        readyToAdvance = false;
+        StartCoroutine(StageTimer());
         Debug.LogFormat("[ID Exchange #{0}] Stage {1}:", moduleId, stage + 1);
         var playerA = rnd.Range(0, 13);
         var playerB = rnd.Range(0, 13);
@@ -188,6 +192,17 @@ public partial class idExchange : MonoBehaviour
         mainPortraits[0].material.mainTexture = portraitTextures[playerA];
         mainPortraits[1].material.mainTexture = portraitTextures[playerB];
         screenText.text = ((stage + 1) % 1000).ToString("000");
+    }
+
+    private IEnumerator StageTimer()
+    {
+        var elapsed = 0f;
+        while (elapsed < waitTime)
+        {
+            yield return null;
+            elapsed += Time.deltaTime;
+        }
+        readyToAdvance = true;
     }
 
     private void ReadyToSolve()
@@ -350,11 +365,13 @@ public partial class idExchange : MonoBehaviour
 
     private void Update()
     {
-        if (solvable || moduleSolved)
+        if (solvable || moduleSolved || !readyToAdvance)
             return;
         var prevAmountSolved = currentlySolved;
         currentlySolved = bomb.GetSolvedModuleNames().Where(x => !ignoreList.Contains(x)).Count();
-        if (currentlySolved != prevAmountSolved)
+        if (currentlySolved == stage || solvable)
+            return;
+        if (stage <= currentlySolved)
         {
             stage++;
             if (stage == stageCount)
