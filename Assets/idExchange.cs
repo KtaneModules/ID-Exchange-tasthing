@@ -20,6 +20,7 @@ public partial class idExchange : MonoBehaviour
     public Renderer[] mainPortraits;
     public TextMesh screenText;
     public Texture[] portraitTextures;
+    public Texture[] newPortraitTextures;
     public GameObject[] tokenIcons;
     public GameObject hidable;
     public GameObject garnet;
@@ -39,18 +40,48 @@ public partial class idExchange : MonoBehaviour
     private int currentlySolved;
     private string[] ignoreList;
     private bool readyToAdvance = true;
-    private const float waitTime = 5f; // change this as you wish
+    private const float waitTime = 3.5f; // change this as you wish
 
     private static readonly string[] letterRows = new string[13] { "AZ", "BY", "CX", "DW", "EV", "FU", "GT", "HS", "IR", "JQ", "KP", "LO", "MN" };
-    private static readonly string[] playerNames = new string[13] { "Jungmoon", "Yeonseung", "Jinho", "Dongmin", "Kyunghoon", "Kyungran", "Yoohyun", "Junseok", "Sangmin", "Yohwan", "Yoonsun", "Hyunmin", "Junghyun" };
+    private string[] playerNames = new string[13] { "Jungmoon", "Yeonseung", "Jinho", "Dongmin", "Kyunghoon", "Kyungran", "Yoohyun", "Junseok", "Sangmin", "Yohwan", "Yoonsun", "Hyunmin", "Junghyun" };
 
     private static int moduleIdCounter = 1;
     private int moduleId;
     private bool moduleSolved;
 
+    #region ModSettings
+    idExchangeSettings Settings = new idExchangeSettings();
+#pragma warning disable 414
+    private static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
+    {
+      new Dictionary<string, object>
+      {
+        { "Filename", "ID Exchange Settings.json"},
+        { "Name", "ID Exchange" },
+        { "Listings", new List<Dictionary<string, object>>
+        {
+          new Dictionary<string, object>
+          {
+            { "Key", "ClassicMode" },
+            { "Text", "Enable classic mode and display the old icons"}
+          }
+        }}
+      }
+    };
+#pragma warning restore 414
+
+    private class idExchangeSettings
+    {
+        public bool ClassicMode = false;
+    }
+    #endregion
+
     private void Awake()
     {
         moduleId = moduleIdCounter++;
+        var modConfig = new modConfig<idExchangeSettings>("Id Exchange Settings");
+        Settings = modConfig.read();
+
         foreach (KMSelectable card in cards)
             card.OnInteract += delegate () { PressCard(card); return false; };
         foreach (KMSelectable portrait in portraitButtons)
@@ -59,9 +90,12 @@ public partial class idExchange : MonoBehaviour
         crosshair.OnInteract += delegate () { PressCrosshair(); return false; };
         for (int i = 0; i < 13; i++)
         {
-            portraitButtons[i].GetComponent<Renderer>().material.mainTexture = portraitTextures[i];
+            portraitButtons[i].GetComponent<Renderer>().material.mainTexture = Settings.ClassicMode ? portraitTextures[i] : newPortraitTextures[i];
             tokenIcons[i].SetActive(false);
         }
+        if (!Settings.ClassicMode)
+            for (int i = 0; i < playerNames.Length; i++)
+                playerNames[i] = "Player " + (i + 1);
     }
 
     private void Start()
@@ -189,8 +223,8 @@ public partial class idExchange : MonoBehaviour
         playerRoles[playerA] = roleB;
         if (bothRoles.Contains(role.convict))
             lastConvict = Array.IndexOf(bothRoles, role.convict) == 0 ? playerA : playerB;
-        mainPortraits[0].material.mainTexture = portraitTextures[playerA];
-        mainPortraits[1].material.mainTexture = portraitTextures[playerB];
+        mainPortraits[0].material.mainTexture = Settings.ClassicMode ? portraitTextures[playerA] : newPortraitTextures[playerA];
+        mainPortraits[1].material.mainTexture = Settings.ClassicMode ? portraitTextures[playerB] : newPortraitTextures[playerB];
         screenText.text = ((stage + 1) % 1000).ToString("000");
     }
 
@@ -213,8 +247,8 @@ public partial class idExchange : MonoBehaviour
             mainPortraits[i].gameObject.SetActive(false);
             cards[i].gameObject.SetActive(false);
         }
-        mainPortraits[0].material.mainTexture = portraitTextures[allStages[0].playerA];
-        mainPortraits[1].material.mainTexture = portraitTextures[allStages[0].playerB];
+        mainPortraits[0].material.mainTexture = Settings.ClassicMode ? portraitTextures[allStages[0].playerA] : newPortraitTextures[allStages[0].playerA];
+        mainPortraits[1].material.mainTexture = Settings.ClassicMode ? portraitTextures[allStages[0].playerB] : newPortraitTextures[allStages[0].playerB];
         screenText.text = "???";
         hidable.SetActive(true);
         if (lastConvict != -1)
@@ -267,8 +301,8 @@ public partial class idExchange : MonoBehaviour
         else
             recoveryDisplay = recoveryDisplay == stageCount - 1 ? recoveryDisplay : recoveryDisplay + 1;
         var thisStage = allStages[recoveryDisplay];
-        mainPortraits[0].material.mainTexture = portraitTextures[thisStage.playerA];
-        mainPortraits[1].material.mainTexture = portraitTextures[thisStage.playerB];
+        mainPortraits[0].material.mainTexture = Settings.ClassicMode ? portraitTextures[thisStage.playerA] : newPortraitTextures[thisStage.playerA];
+        mainPortraits[1].material.mainTexture = Settings.ClassicMode ? portraitTextures[thisStage.playerB] : newPortraitTextures[thisStage.playerB];
         screenText.text = ((thisStage.stageNumber + 1) % 1000).ToString("000");
     }
 
@@ -367,7 +401,6 @@ public partial class idExchange : MonoBehaviour
     {
         if (solvable || moduleSolved || !readyToAdvance)
             return;
-        var prevAmountSolved = currentlySolved;
         currentlySolved = bomb.GetSolvedModuleNames().Where(x => !ignoreList.Contains(x)).Count();
         if (currentlySolved == stage || solvable)
             return;
