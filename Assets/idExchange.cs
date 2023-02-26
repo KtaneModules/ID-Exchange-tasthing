@@ -24,6 +24,7 @@ public partial class idExchange : MonoBehaviour
     public GameObject[] tokenIcons;
     public GameObject hidable;
     public GameObject garnet;
+    public GameObject logo;
 
     private role[] playerRoles = new role[13];
     private int[] playerScores = new int[13];
@@ -91,8 +92,11 @@ public partial class idExchange : MonoBehaviour
         for (int i = 0; i < 13; i++)
         {
             portraitButtons[i].GetComponent<Renderer>().material.mainTexture = Settings.ClassicMode ? portraitTextures[i] : newPortraitTextures[i];
+            portraitButtons[i].transform.localScale = Settings.ClassicMode ? new Vector3(.025f, .024423076923076922f, .025f) : new Vector3(.025f, .02994723f, .025f);
             tokenIcons[i].SetActive(false);
         }
+        mainPortraits[0].transform.localScale = Settings.ClassicMode ? new Vector3(.05f, .048846153846153845f, .05f) : new Vector3(.05f, .05989446f, .05f);
+        mainPortraits[1].transform.localScale = Settings.ClassicMode ? new Vector3(.05f, .048846153846153845f, .05f) : new Vector3(.05f, .05989446f, .05f);
         if (!Settings.ClassicMode)
             for (int i = 0; i < playerNames.Length; i++)
                 playerNames[i] = "Player " + (i + 1);
@@ -246,6 +250,7 @@ public partial class idExchange : MonoBehaviour
         {
             mainPortraits[i].gameObject.SetActive(false);
             cards[i].gameObject.SetActive(false);
+            logo.SetActive(false);
         }
         mainPortraits[0].material.mainTexture = Settings.ClassicMode ? portraitTextures[allStages[0].playerA] : newPortraitTextures[allStages[0].playerA];
         mainPortraits[1].material.mainTexture = Settings.ClassicMode ? portraitTextures[allStages[0].playerB] : newPortraitTextures[allStages[0].playerB];
@@ -286,7 +291,9 @@ public partial class idExchange : MonoBehaviour
         {
             mainPortraits[i].gameObject.SetActive(false);
             cards[i].gameObject.SetActive(false);
+            logo.SetActive(false);
         }
+        base.gameObject.SetActive(false);
     }
 
     private void PressCard(KMSelectable card)
@@ -355,6 +362,7 @@ public partial class idExchange : MonoBehaviour
                 mainPortraits[i].gameObject.SetActive(true);
                 cards[i].gameObject.SetActive(true);
             }
+            logo.SetActive(true);
         }
         else
         {
@@ -364,6 +372,7 @@ public partial class idExchange : MonoBehaviour
                 mainPortraits[i].gameObject.SetActive(false);
                 cards[i].gameObject.SetActive(false);
             }
+            logo.SetActive(false);
             hidable.SetActive(true);
         }
     }
@@ -376,7 +385,7 @@ public partial class idExchange : MonoBehaviour
         audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonRelease, crosshair.transform);
         if (selectedTokens.SequenceEqual(tokens))
         {
-            Debug.LogFormat("[ID Exchange #{0}] You submitted the correct tokens. Now identify the convict.", moduleId);
+            Debug.LogFormat("[ID Exchange #{0}] You submitted the correct tokens. Now identify the convict, who is {1}.", moduleId, playerNames[Array.IndexOf(playerRoles, role.convict)]);
             crosshair.gameObject.SetActive(false);
             foreach (GameObject token in tokenIcons)
                 token.SetActive(false);
@@ -447,7 +456,7 @@ public partial class idExchange : MonoBehaviour
 
     // Twitch Plays
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "!{0} Jungmoon [Press Jungmoon's portrait, any name on the module can be used] | !{0} display [Press the stage counter] | !{0} crosshair [Press the crosshair] | !{0} <left/right> [Press that blank card] | !{0} stage <xx> [During stage recovery, press the blank cards until stage xx is displayed]";
+    private readonly string TwitchHelpMessage = "!{0} Jungmoon [Press Jungmoon's portrait, any name on the module can be used. When not in classic mode, players are named \"player x\" where x is their position in reading order.] | !{0} display [Press the stage counter] | !{0} crosshair [Press the crosshair] | !{0} <left/right> [Press that blank card] | !{0} stage <xx> [During stage recovery, press the blank cards until stage xx is displayed]";
 #pragma warning restore 414
 
     private IEnumerator ProcessTwitchCommand(string input)
